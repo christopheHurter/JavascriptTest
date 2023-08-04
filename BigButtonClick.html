@@ -1,6 +1,9 @@
     <!-- Add Bootstrap JS (Optional, if you want to use Bootstrap's JavaScript components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+
+
+
         // JavaScript to dynamically set the button width and handle click counting
         window.addEventListener('DOMContentLoaded', function() {
             var button = document.getElementById('myButton');
@@ -8,6 +11,10 @@
 
             var buttonWidth = (pageWidth * 0.33) + 'px'; // Calculate the 33% width
             button.style.width = buttonWidth; // Set the calculated width to the button
+            //change the color of the button to yellow
+           // button.style.backgroundColor = "yellow";
+            //change the colore of the text of the button to black
+           // button.style.color = "black";
 
             var clickCount = 0;
             var lastClickTime = 0;
@@ -62,16 +69,42 @@
             justify-content: center;
             align-items: center;
         }
-        #myButton {
+
+        
+        #myButton {     
+       
             width: 33%;
             height: 33%;
             font-size: 16px;
+            color: black ;
+            background-color: coral;
         }
         #saveButton {
             position: fixed;
             bottom: 10px;
             left: 10px;
         }
+
+        .btn-primary
+    {
+    background-color: #8064A2 !important;
+    }
+
+     .btn-primary:hover
+    {
+    background-color: #c08dff !important;
+    }
+
+    .btn-primary:active
+    {
+    background-color: #736783 !important;
+    }
+
+     .btn-primary:visited 
+    {
+    background-color: #f4f1f7 !important;
+    }
+
     </style>
 </head>
 <body>
