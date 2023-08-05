@@ -64,7 +64,7 @@
         window.addEventListener('DOMContentLoaded', function () {
 
             var gridSize = 3; // Number of rows and columns in the grid
-            var nbrRepetition = 2;  //Number of repetition of the grid
+            var nbrRepetition =1;  //Number of repetition of the grid
 
 
             var button = document.getElementById('myButton');
@@ -150,6 +150,13 @@
                     a.click();
 
                     indexCombinaison = 0;
+
+                    //Change the button text
+                    button.textContent = `This is done! `;
+                 
+                    //Hide the button
+                    button.style.display = "none";
+
 
                 }
                 else {
