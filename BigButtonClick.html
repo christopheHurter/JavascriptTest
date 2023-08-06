@@ -15,57 +15,65 @@
 
 
         function mouseDownOnButton() {
-                var currentTime = Date.now();
-                if (lastClickTime !== 0) {
-                    var timeDifference = currentTime - lastClickTime;
-                    timeDifferences.push(timeDifference);
-                    button.textContent = `Click me! (${clickCount}) Time Between Clicks: ${timeDifference} milliseconds`;
-                } else {
-                    button.textContent = `Click me! (${clickCount})`;
-                }
-                //Hide the button
+            var currentTime = Date.now();
+            if (lastClickTime !== 0) {
+                var timeDifference = currentTime - lastClickTime;
+                timeDifferences.push(timeDifference);
+                button.textContent = `Click me! (${clickCount}) Time Between Clicks: ${timeDifference} milliseconds`;
+            } else {
+                button.textContent = `Click me! (${clickCount})`;
+            }
+            //Hide the button
+            button.style.display = "none";
+
+            clickCount++;
+            console.log(clickCount + "/" + maxClick);
+
+            if (clickCount > maxClick) {
                 button.style.display = "none";
 
-                clickCount++;
-                console.log(clickCount + "/" + maxClick );
+                var textToSave = timeDifferences.join('\n');
+                var blob = new Blob([textToSave], { type: 'text/plain' });
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
 
-                if (clickCount > maxClick) {
-                    button.style.display = "none";
+                //Build the name of the file
+                var userID = document.getElementById('userID').value;
+                //Get the experimentation type from the combo box
+                var experimentationType = document.getElementById('myComboBoxExpetype').value;
+                var fileName = userID + "_" + experimentationType + "1BigButton.txt";
+                a.download = fileName;
 
-                    var textToSave = timeDifferences.join('\n');
-                    var blob = new Blob([textToSave], { type: 'text/plain' });
-                    var url = window.URL.createObjectURL(blob);
-                    var a = document.createElement('a');
-                    a.href = url;
+                a.click();
 
-                    //Build the name of the file
-                    var userID = document.getElementById('userID').value;
-                    //Get the experimentation type from the combo box
-                    var experimentationType = document.getElementById('myComboBoxExpetype').value;
-console.log(experimentationType);
-
-                    var fileName = userID + "_" + experimentationType + ".txt";
-                    a.download = fileName;
-                   
-                    a.click();
-                  
-                }
-                else {
-                    //Create the timer and when timeout, then show the button
-                    setTimeout(function () {
-                        button.style.display = "block";
-                        //Reset the time
-                        lastClickTime = Date.now();
-                    }, 1000); // 1000 milliseconds = 1 second
-                }
+                //Show the div UserInfo
+                //Get the div UserInfo and hide it
+                var divUserInfo = document.getElementById('UserInfo');
+                divUserInfo.style.display = "block";
             }
-           
+            else {
+                //Create the timer and when timeout, then show the button
+                setTimeout(function () {
+                    button.style.display = "block";
+                    //Reset the time
+                    lastClickTime = Date.now();
+                }, 1000); // 1000 milliseconds = 1 second
+            }
+        }
+
         function RunExperimentation() {
+
+            //Get the div UserInfo and hide it
+            var divUserInfo = document.getElementById('UserInfo');
+            divUserInfo.style.display = "none";
+
+            //Get the number of trials
             var trials = document.getElementById('trials').value;
             maxClick = trials;
 
             //show myButton
-          var pageWidth = window.innerWidth; // Get the width of the window
+            var pageWidth = window.innerWidth; // Get the width of the window
 
             var buttonWidth = (pageWidth * 0.33) + 'px'; // Calculate the 33% width
             button.style.width = buttonWidth; // Set the calculated width to the button
@@ -83,14 +91,15 @@ console.log(experimentationType);
             timeDifferences = [];
             button.textContent = `Start`;
 
-//Test if the button already has an event listener
+
+
+            //Test if the button already has an event listener
             if (button.hasEventListener) {
                 //Remove the button event listener
                 button.removeEventListener('click', mouseDownOnButton, true);
                 console.log("Remove the button event listener");
             }
-            else
-            {
+            else {
                 console.log("The button does not have an event listener");
             }
 
@@ -160,7 +169,7 @@ console.log(experimentationType);
 </head>
 
 <body>
-    <div>
+    <div id="UserInfo">
         <select id="myComboBoxExpetype">
             <option value="Dwell time">Dwell time</option>
             <option value="Pinch">Pinch</option>
@@ -168,7 +177,7 @@ console.log(experimentationType);
         </select>
         <label for="UserID">User ID:</label>
         <input type="text" id="userID" value="1">
-      
+
         <label for="trials">Number of trials:</label>
         <input type="text" id="trials" name="trials" value="5">
         <button id="myButtonStart" class="btn btn-primary">Start RunExperimentation</button>
@@ -178,4 +187,5 @@ console.log(experimentationType);
         <button id="myButton" class="btn btn-primary" hidden>Start</button>
     </div>
 </body>
+
 </html>
