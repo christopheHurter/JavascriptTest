@@ -37,7 +37,16 @@
                     var url = window.URL.createObjectURL(blob);
                     var a = document.createElement('a');
                     a.href = url;
-                    a.download = 'BigButtonClick.txt';
+
+                    //Build the name of the file
+                    var userID = document.getElementById('userID').value;
+                    //Get the experimentation type from the combo box
+                    var experimentationType = document.getElementById('myComboBoxExpetype').value;
+console.log(experimentationType);
+
+                    var fileName = userID + "_" + experimentationType + ".txt";
+                    a.download = fileName;
+                   
                     a.click();
                   
                 }
@@ -152,6 +161,14 @@
 
 <body>
     <div>
+        <select id="myComboBoxExpetype">
+            <option value="Dwell time">Dwell time</option>
+            <option value="Pinch">Pinch</option>
+            <option value="Space Bar">Space Bar</option>
+        </select>
+        <label for="UserID">User ID:</label>
+        <input type="text" id="userID" value="1">
+      
         <label for="trials">Number of trials:</label>
         <input type="text" id="trials" name="trials" value="5">
         <button id="myButtonStart" class="btn btn-primary">Start RunExperimentation</button>
