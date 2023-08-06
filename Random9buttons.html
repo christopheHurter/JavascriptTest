@@ -53,8 +53,23 @@
 
 <body>
 
+    <div id="UserInfo">
+        <select id="myComboBoxExpetype">
+            <option value="Dwell time">Dwell time</option>
+            <option value="Pinch">Pinch</option>
+            <option value="Space Bar">Space Bar</option>
+        </select>
+        <label for="UserID">User ID:</label>
+        <input type="text" id="userID" value="1">
+
+        <label for="trials">Number of repetition:</label>
+        <input type="text" id="trials" name="trials" value="2">
+        <button id="myButtonStart" class="btn btn-primary">Start RunExperimentation</button>
+    </div>
+
+
     <div class="container">
-        <button id="myButton" class="btn btn-primary">Start</button>
+        <button id="myButton" class="btn btn-primary" hidden>Start</button>
     </div>
 
     <!-- Add Bootstrap JS (Optional, if you want to use Bootstrap's JavaScript components) -->
@@ -63,28 +78,34 @@
         // JavaScript to dynamically set the button width and handle click counting
         window.addEventListener('DOMContentLoaded', function () {
 
-            var gridSize = 3; // Number of rows and columns in the grid
-            var nbrRepetition =2;  //Number of repetition of the grid
+            gridSize = 3; // Number of rows and columns in the grid
+            nbrRepetition = 1;  //Number of repetition of the grid
 
 
-            var button = document.getElementById('myButton');
-
-            var gridWidth = window.innerWidth / gridSize;
-            var gridHeight = window.innerHeight / gridSize;
 
 
-            var buttonWidth = gridWidth + 'px';
-            var buttonHeight = gridHeight + 'px';
+            button = document.getElementById('myButton');
+
+            gridWidth = window.innerWidth / gridSize;
+            gridHeight = window.innerHeight / gridSize;
+
+
+            buttonWidth = gridWidth + 'px';
+            buttonHeight = gridHeight + 'px';
 
             button.style.width = buttonWidth; // Set the calculated width to the button
             button.style.height = buttonHeight; // Set the calculated width to the button
 
 
-            var clickCount = 0;
-            var lastClickTime = 0;
-            var timeDifferences = [];
+            clickCount = 0;
+            lastClickTime = 0;
+            timeDifferences = [];
 
-            var currentIndex = 0;
+            currentIndex = 0;
+
+            //Bind the button myButtonStart to the function RunExperimentation
+            document.getElementById('myButtonStart').addEventListener('click', RunExperimentation);
+
 
 
             //Function which gives all the combinations of the grid
@@ -98,82 +119,115 @@
                 return combinations;
             }
 
-            var randomCombinaison = [];
-            var indexCombinaison = 0;
+            function RunExperimentation() {
 
-            for (let index = 0; index < nbrRepetition; index++) {
-                //add items of a random list to the randomListR and randomListC
-                var items = getCombinations(gridSize);
-                //Shuffle the list
-                items.sort(function () {  return 0.5 - Math.random();});
-                for (let indexI = 0; indexI < items.length; indexI++) {
-                    randomCombinaison.push(items[indexI]);
+                //Get the div UserInfo and hide it
+                var divUserInfo = document.getElementById('UserInfo');
+                divUserInfo.style.display = "none";
+
+                //Set the number of repetition with the value of the input trials
+                nbrRepetition = document.getElementById('trials').value;
+                console.log("nbrRepetition", nbrRepetition);
+
+                clickCount = 0;
+                lastClickTime = 0;
+                timeDifferences = [];
+
+                currentIndex = 0;
+
+
+                var randomCombinaison = [];
+                var indexCombinaison = 0;
+
+                //remove the hidden attribute of the button
+                button.removeAttribute('hidden');
+                button.style.display = "block";
+
+                for (let index = 0; index < nbrRepetition; index++) {
+                    //add items of a random list to the randomListR and randomListC
+                    var items = getCombinations(gridSize);
+                    //Shuffle the list
+                    items.sort(function () { return 0.5 - Math.random(); });
+                    for (let indexI = 0; indexI < items.length; indexI++) {
+                        randomCombinaison.push(items[indexI]);
+                    }
                 }
+
+
+
+                button.addEventListener('click', function () {
+                    var currentTime = Date.now();
+                    if (lastClickTime !== 0) {
+
+                        //Count the time difference between the two clicks
+                        var timeDifference = currentTime - lastClickTime;
+                        var col = randomCombinaison[indexCombinaison][0] * gridWidth;
+                        var row = randomCombinaison[indexCombinaison][1] * gridHeight;
+                        timeDifferences.push({
+                            time: timeDifference,
+                            position: { col, row }
+                        });
+
+                        button.textContent = `Click me! (${clickCount}) Time Between Clicks: ${timeDifference} milliseconds`;
+
+                        indexCombinaison++
+                    }
+                    else {
+                        //First click, do nothing
+                        button.textContent = `Click me! (${clickCount})`;
+                    }
+
+                    //Stop the experiment after the last click
+                    if (indexCombinaison == randomCombinaison.length) {
+                        console.log("saving data");
+                        //Save the data in a text file
+
+                        var dataToSave = timeDifferences.map(item => `${item.time};${item.position.col};${item.position.row}`).join('\n');
+                        var contentToSave = `TimeDifference;Column;Row\n${dataToSave}`;
+                        var blob = new Blob([contentToSave], { type: 'text/plain' });
+                        var url = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+
+                        //Build the name of the file
+                        var userID = document.getElementById('userID').value;
+                        //Get the experimentation type from the combo box
+                        var experimentationType = document.getElementById('myComboBoxExpetype').value;
+                        var fileName = userID + "_" + experimentationType + "9Buttons.txt";
+                        a.download = fileName;
+                        a.click();
+
+                        indexCombinaison = 0;
+
+                        //Change the button text
+                        button.textContent = `This is done! `;
+
+                        //Hide the button
+                        button.style.display = "none";
+
+                        //Show the div UserInfo
+                        //Get the div UserInfo and hide it
+                        var divUserInfo = document.getElementById('UserInfo');
+                        divUserInfo.style.display = "block";
+
+
+                    }
+                    else {
+                        console.log("indexCombinaison", indexCombinaison);
+
+                        //Set the position of the button
+                        console.log("timeDifferences", timeDifferences)
+                        button.style.left = randomCombinaison[indexCombinaison][0] * gridWidth + 'px';
+                        button.style.top = randomCombinaison[indexCombinaison][1] * gridHeight + 'px';
+
+                        lastClickTime = currentTime;
+                        clickCount++;
+
+                    }
+
+
+                });
             }
-
-
-
-            button.addEventListener('click', function () {
-                var currentTime = Date.now();
-                if (lastClickTime !== 0) {
-
-                    //Count the time difference between the two clicks
-                    var timeDifference = currentTime - lastClickTime;
-                    var col = randomCombinaison[indexCombinaison][0] * gridWidth;
-                    var row = randomCombinaison[indexCombinaison][1] * gridHeight;
-                    timeDifferences.push({
-                        time: timeDifference,
-                        position: { col, row }
-                    });
-
-                    button.textContent = `Click me! (${clickCount}) Time Between Clicks: ${timeDifference} milliseconds`;
-
-                    indexCombinaison++
-                }
-                else {
-                    //First click, do nothing
-                    button.textContent = `Click me! (${clickCount})`;
-                }
-
-                //Stop the experiment after the last click
-                if (indexCombinaison == randomCombinaison.length) {
-                    console.log("saving data");
-                    //Save the data in a text file
-
-                    var dataToSave = timeDifferences.map(item => `${item.time};${item.position.col};${item.position.row}`).join('\n');
-                    var contentToSave = `TimeDifference;Column;Row\n${dataToSave}`;
-                    var blob = new Blob([contentToSave], { type: 'text/plain' });
-                    var url = window.URL.createObjectURL(blob);
-                    var a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'time_differences.txt';
-                    a.click();
-
-                    indexCombinaison = 0;
-
-                    //Change the button text
-                    button.textContent = `This is done! `;
-                 
-                    //Hide the button
-                    button.style.display = "none";
-
-
-                }
-                else {
-                    console.log("indexCombinaison", indexCombinaison);
-
-                    //Set the position of the button
-                    console.log("timeDifferences", timeDifferences)
-                    button.style.left = randomCombinaison[indexCombinaison][0] * gridWidth + 'px';
-                    button.style.top = randomCombinaison[indexCombinaison][1] * gridHeight + 'px';
-
-                    lastClickTime = currentTime;
-                    clickCount++;
-
-                }
-
-
-            });
         });
     </script>
 </body>
